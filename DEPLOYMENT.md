@@ -83,6 +83,7 @@ curl -i -N -X POST http://34.87.10.146/ask-multi-agent/stream \
 ## Screenshots
 - [Deployment dashboard](screenshots/dashboard.png)
 - [Service running](screenshots/running.png)
+- [GitHub Actions CI/CD success](screenshots/github_action.png)
 - [Health check result](screenshots/test_health.png)
 - [Readiness check result](screenshots/test_ready.png)
 - [Unauthorized test (401)](screenshots/test_unauthorized.png)
