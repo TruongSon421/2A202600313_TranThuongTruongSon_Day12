@@ -65,4 +65,16 @@ jobs:
             fi
             docker compose up -d --build --remove-orphans
             docker compose ps
-            curl --fail --silent --show-error http://localhost/health >/dev/null
+            # Wait for nginx -> agent upstream to become healthy.
+            for i in $(seq 1 30); do
+              if curl --fail --silent --show-error http://localhost/health >/dev/null; then
+                echo "Health check passed"
+                exit 0
+              fi
+              echo "Health check attempt ${i}/30 failed, retrying in 5s..."
+              sleep 5
+            done
+            echo "Health check failed after retries"
+            docker compose ps
+            docker compose logs --tail=120 agent frontend
+            exit 1
