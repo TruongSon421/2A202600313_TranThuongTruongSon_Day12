@@ -16,7 +16,7 @@ Kết hợp TẤT CẢ những gì đã học trong 1 project hoàn chỉnh.
 - [x] Config từ environment variables
 - [x] Structured logging
 - [x] Graceful shutdown
-- [x] Public URL ready (Railway / Render config)
+- [x] Public URL ready (GCP Compute Engine)
 
 ---
 
@@ -32,8 +32,7 @@ Kết hợp TẤT CẢ những gì đã học trong 1 project hoàn chỉnh.
 │   └── cost_guard.py   # Budget protection
 ├── Dockerfile          # Multi-stage, production-ready
 ├── docker-compose.yml  # Full stack (agent + redis + qdrant + mysql)
-├── railway.toml        # Deploy Railway
-├── render.yaml         # Deploy Render
+├── ...                 # Deploy with Terraform in /deployment
 ├── .env.example        # Template
 ├── .dockerignore
 └── requirements.txt
@@ -63,70 +62,39 @@ curl -H "X-API-Key: $API_KEY" \
 
 ---
 
-## Deploy Railway (< 5 phút)
+## Deploy GCP Compute Engine + Terraform
 
-```bash
-# Cài Railway CLI
-npm i -g @railway/cli
+IaC va script deploy dat tai:
 
-# Login và deploy
-railway login
-railway init
-railway variables set OPENAI_API_KEY=sk-...
-railway variables set AGENT_API_KEY=your-secret-key
-railway up
+- `deployment/production-compute-engine/terraform`
 
-# Nhận public URL!
-railway domain
-```
+Flow:
 
----
+1. `terraform init && terraform plan && terraform apply`
+2. SSH vao VM vua tao
+3. Clone repo, tao `.env`, chay `docker compose up -d --build`
+4. Truy cap public IP cua VM (port 80)
 
-## Deploy Render
+## CI/CD GitHub Actions (Compute Engine)
 
-1. Push repo lên GitHub
-2. Render Dashboard → New → Blueprint
-3. Connect repo → Render đọc `render.yaml`
-4. Set secrets: `OPENAI_API_KEY`, `AGENT_API_KEY`
-5. Deploy → Nhận URL!
+Workflow:
 
----
+- `.github/workflows/terraform-plan-compute.yml`
+  - Trigger khi doi `deployment/production-compute-engine/terraform/**`
+  - Chay `terraform fmt -check`, `terraform validate`, `terraform plan`
+- `.github/workflows/compute-engine-cicd.yml`
+  - Trigger khi doi `06-lab-complete/**`
+  - PR: build validate backend/frontend
+  - Push `main`: copy source len VM va chay `docker compose up -d --build`
 
-## CI/CD GitHub Actions -> Cloud Run (khong can zip)
+### GitHub Secrets can co
 
-Da co workflow san tai `.github/workflows/cloud-run-cicd.yml`:
-
-- PR: chi chay `docker build` de validate backend/frontend.
-- Push vao `main`: tu dong build image, push Artifact Registry, cap nhat Secret Manager va deploy Cloud Run.
-- Co the chay tay bang `workflow_dispatch`.
-
-### 1) Tao GitHub Secrets
-
-Vao **GitHub repo -> Settings -> Secrets and variables -> Actions**, tao cac secret:
-
-- `GCP_PROJECT_ID`
-- `GCP_SA_KEY` (JSON key cua service account)
-- `OPENAI_API_KEY`
-- `AGENT_API_KEY`
-- `JWT_SECRET`
-- `ADMIN_EMAIL`
-- `ADMIN_PASSWORD`
-
-### 2) Quyen service account toi thieu
-
-Gan cac role sau cho service account dung trong `GCP_SA_KEY`:
-
-- `roles/run.admin`
-- `roles/artifactregistry.admin`
-- `roles/secretmanager.admin`
-- `roles/iam.serviceAccountUser`
-- `roles/serviceusage.serviceUsageAdmin`
-
-### 3) Luong deploy
-
-1. Merge code vao `main`.
-2. GitHub Actions se chay workflow `Cloud Run CI/CD`.
-3. Sau khi thanh cong, service URL hien trong log buoc `Output deployed service URL`.
+- `TF_VAR_PROJECT_ID`
+- `TF_VAR_SSH_PUBLIC_KEY`
+- `GCE_HOST`
+- `GCE_USER`
+- `GCE_SSH_KEY`
+- `GCE_PORT`
 
 ---
 
