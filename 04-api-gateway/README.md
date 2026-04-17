@@ -89,3 +89,9 @@ Request
 1. Khi nào nên dùng API Key vs JWT vs OAuth2?
 2. Rate limit nên đặt bao nhiêu request/phút cho một AI agent?
 3. Nếu API key bị lộ, bạn phát hiện và xử lý như thế nào?
+
+
+
+1. API Key phù hợp service-to-service đơn giản, internal tool, hoặc MVP nhanh. JWT phù hợp khi cần đăng nhập user, phân quyền theo role, và stateless auth cho nhiều request. OAuth2 phù hợp khi tích hợp bên thứ ba (Google/GitHub/Microsoft login), cần delegated access và chuẩn enterprise.
+2. Không có một con số cố định cho mọi hệ thống; nên bắt đầu theo tier. Ví dụ lab này: user thường `10 req/phút`, admin cao hơn. Với production, nên dựa trên chi phí/token, độ trễ model, hành vi người dùng thật, rồi tinh chỉnh theo metrics (429 rate, latency, cost/user).
+3. Cần làm theo incident flow: thu hồi/rotate key ngay, chặn key cũ, kiểm tra logs để xác định phạm vi lạm dụng, giới hạn tạm thời qua rate limit/IP allowlist, cập nhật key mới cho client hợp lệ, và bổ sung cảnh báo tự động (spike usage, failed auth) để phát hiện sớm lần sau.

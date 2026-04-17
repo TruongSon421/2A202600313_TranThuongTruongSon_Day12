@@ -70,3 +70,7 @@ python app.py
 1. Điều gì xảy ra nếu bạn push code với API key hardcode lên GitHub public?
 2. Tại sao stateless quan trọng khi scale?
 3. 12-factor nói "dev/prod parity" — nghĩa là gì trong thực tế?
+
+1. API key có thể bị bot quét và lạm dụng trong vài phút, dẫn đến mất tiền, rò rỉ dữ liệu, và phải rotate/revoke key khẩn cấp. Ngoài ra commit history vẫn giữ dấu vết secret nếu không xử lý đúng.
+2. Stateless giúp nhiều instance phục vụ cùng một user mà không mất context do state bị "kẹt" trong RAM của một máy. Khi scale ngang hoặc instance chết/restart, request vẫn chạy bình thường nếu state nằm ở Redis/DB.
+3. Dev/prod parity nghĩa là môi trường dev phải càng giống production càng tốt (version Python, dependencies, biến môi trường, service phụ trợ như Redis/DB, cách chạy app). Càng giống thì càng giảm lỗi kiểu "chạy local được nhưng deploy fail".
