@@ -1,0 +1,15 @@
+QUY TRÌNH CHECK-IN VÀ THỜI GIAN BIỂU TẠI SÂN BAY
+Mã tài liệu: 04_CI
+
+1. CÁC HÌNH THỨC CHECK-IN
+- Check-in trực tuyến (Web/App): Thường mở trước 24h và đóng trước 1h so với giờ bay.
+- Check-in tại Kiosk: Các máy tự động đặt tại sân bay.
+- Check-in tại quầy: Dành cho khách có hành lý ký gửi hoặc cần hỗ trợ đặc biệt.
+
+2. THỜI GIAN CÓ MẶT TẠI SÂN BAY
+- Chuyến bay nội địa: Có mặt trước ít nhất 2 tiếng. Quầy thủ tục đóng cửa 40 phút trước giờ khởi hành.
+- Chuyến bay quốc tế: Có mặt trước ít nhất 3 tiếng. Quầy thủ tục đóng cửa 50-60 phút trước giờ khởi hành.
+
+3. THỜI GIAN TẠI CỬA KHỞI HÀNH (BOARDING GATE)
+- Hành khách phải có mặt tại cửa ra máy bay ít nhất 30-40 phút trước giờ bay.
+- Cửa ra máy bay sẽ đóng 15-20 phút trước khi máy bay cất cánh. Nếu đến muộn sau thời điểm này, hành khách sẽ bị hủy chuyến và tự chịu trách nhiệm.

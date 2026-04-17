@@ -1,0 +1,18 @@
+DANH MỤC VẬT PHẨM NGUY HIỂM VÀ QUY ĐỊNH VỀ PIN
+Mã tài liệu: 05_VPC
+
+1. VẬT PHẨM CẤM TUYỆT ĐỐI (CẢ KÝ GỬI VÀ XÁCH TAY)
+- Chất nổ: Pháo hoa, thuốc súng, đạn dược.
+- Chất lỏng dễ cháy: Xăng, dầu, cồn, sơn, dung môi.
+- Khí nén: Bình ga, bình xịt cay.
+- Chất độc hại: Chất phóng xạ, chất lây nhiễm, thuốc trừ sâu.
+
+2. QUY ĐỊNH VỀ PIN LITHIUM VÀ SẠC DỰ PHÒNG
+- Pin dự phòng PHẢI ĐỂ TRONG HÀNH LÝ XÁCH TAY. Nghiêm cấm ký gửi do nguy cơ cháy nổ dưới hầm hàng.
+- Công suất dưới 100Wh: Được mang theo không giới hạn (nhưng phải phục vụ mục đích cá nhân).
+- Công suất từ 100Wh - 160Wh: Cần sự đồng ý của hãng hàng không (giới hạn tối đa 2 viên).
+- Công suất trên 160Wh: Bị cấm mang lên máy bay.
+
+3. CÁC VẬT DỤNG HẠN CHẾ
+- Thuốc lá điện tử: Chỉ xách tay, không được sử dụng trên máy bay.
+- Diêm/Bật lửa: Chỉ được mang theo 01 chiếc trên người (không để trong hành lý).

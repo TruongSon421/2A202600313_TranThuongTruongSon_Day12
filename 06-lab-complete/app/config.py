@@ -1,6 +1,6 @@
-"""Production config — 12-Factor: tất cả từ environment variables."""
-import os
+"""Production config loaded strictly from environment variables."""
 import logging
+import os
 from dataclasses import dataclass, field
 
 
@@ -19,18 +19,26 @@ class Settings:
     # LLM
     openai_api_key: str = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
     llm_model: str = field(default_factory=lambda: os.getenv("LLM_MODEL", "gpt-4o-mini"))
+    embedding_model: str = field(default_factory=lambda: os.getenv("EMBEDDING_MODEL", "text-embedding-3-small"))
+    enable_nemo_guardrails: bool = field(
+        default_factory=lambda: os.getenv("ENABLE_NEMO_GUARDRAILS", "true").lower() == "true"
+    )
 
     # Security
-    agent_api_key: str = field(default_factory=lambda: os.getenv("AGENT_API_KEY", "dev-key-change-me"))
     jwt_secret: str = field(default_factory=lambda: os.getenv("JWT_SECRET", "dev-jwt-secret"))
+    jwt_algorithm: str = field(default_factory=lambda: os.getenv("JWT_ALGORITHM", "HS256"))
+    jwt_expire_minutes: int = field(default_factory=lambda: int(os.getenv("JWT_EXPIRE_MINUTES", "60")))
+    jwt_refresh_expire_minutes: int = field(
+        default_factory=lambda: int(os.getenv("JWT_REFRESH_EXPIRE_MINUTES", "10080"))
+    )
+    admin_email: str = field(default_factory=lambda: os.getenv("ADMIN_EMAIL", "admin@example.com").lower())
+    admin_password: str = field(default_factory=lambda: os.getenv("ADMIN_PASSWORD", "Admin@123456"))
     allowed_origins: list = field(
         default_factory=lambda: os.getenv("ALLOWED_ORIGINS", "*").split(",")
     )
 
     # Rate limiting
-    rate_limit_per_minute: int = field(
-        default_factory=lambda: int(os.getenv("RATE_LIMIT_PER_MINUTE", "20"))
-    )
+    rate_limit_per_minute: int = field(default_factory=lambda: int(os.getenv("RATE_LIMIT_PER_MINUTE", "10")))
 
     # Budget
     daily_budget_usd: float = field(
@@ -38,17 +46,33 @@ class Settings:
     )
 
     # Storage
-    redis_url: str = field(default_factory=lambda: os.getenv("REDIS_URL", ""))
+    redis_url: str = field(default_factory=lambda: os.getenv("REDIS_URL", "redis://localhost:6379/0"))
+    qdrant_url: str = field(default_factory=lambda: os.getenv("QDRANT_URL", "http://localhost:6333"))
+    qdrant_collection_air_rules: str = field(
+        default_factory=lambda: os.getenv("QDRANT_COLLECTION_AIR_RULES", "airline_regulations")
+    )
+    database_url: str = field(
+        default_factory=lambda: os.getenv(
+            "DATABASE_URL",
+            "mysql+pymysql://agent_user:agent_pass@localhost:3306/agent_db",
+        )
+    )
 
     def validate(self):
         logger = logging.getLogger(__name__)
         if self.environment == "production":
-            if self.agent_api_key == "dev-key-change-me":
-                raise ValueError("AGENT_API_KEY must be set in production!")
             if self.jwt_secret == "dev-jwt-secret":
                 raise ValueError("JWT_SECRET must be set in production!")
         if not self.openai_api_key:
             logger.warning("OPENAI_API_KEY not set — using mock LLM")
+        if self.rate_limit_per_minute <= 0:
+            raise ValueError("RATE_LIMIT_PER_MINUTE must be > 0")
+        if self.daily_budget_usd <= 0:
+            raise ValueError("DAILY_BUDGET_USD must be > 0")
+        if self.jwt_expire_minutes <= 0:
+            raise ValueError("JWT_EXPIRE_MINUTES must be > 0")
+        if self.jwt_refresh_expire_minutes <= 0:
+            raise ValueError("JWT_REFRESH_EXPIRE_MINUTES must be > 0")
         return self
 
 

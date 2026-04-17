@@ -34,3 +34,12 @@ Thumbs.db
 # ── Docker volumes (local dev) ─────────────────────��──────
 data/
 volumes/
+
+#frontend
+frontend/node_modules/
+
+#terraform
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+terraform.tfvars

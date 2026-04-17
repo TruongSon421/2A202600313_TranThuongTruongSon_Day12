@@ -1,0 +1,51 @@
+name: Terraform Plan (Compute Engine)
+
+on:
+  pull_request:
+    paths:
+      - "deployment/production-compute-engine/terraform/**"
+  push:
+    branches:
+      - main
+    paths:
+      - "deployment/production-compute-engine/terraform/**"
+  workflow_dispatch:
+
+jobs:
+  terraform-plan:
+    name: Terraform Format + Validate + Plan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: deployment/production-compute-engine/terraform
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Terraform fmt check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Write terraform.tfvars for CI plan
+        env:
+          TF_VAR_project_id: ${{ secrets.TF_VAR_PROJECT_ID }}
+          TF_VAR_ssh_public_key: ${{ secrets.TF_VAR_SSH_PUBLIC_KEY }}
+        run: |
+          cat > terraform.tfvars <<EOF
+          project_id = "${TF_VAR_project_id}"
+          ssh_public_key = "${TF_VAR_ssh_public_key}"
+          EOF
+
+      - name: Terraform plan
+        run: terraform plan -input=false -no-color

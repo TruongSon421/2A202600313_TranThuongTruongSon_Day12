@@ -1,0 +1,68 @@
+name: Compute Engine CI/CD
+
+on:
+  pull_request:
+    paths:
+      - "06-lab-complete/**"
+      - ".github/workflows/compute-engine-cicd.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "06-lab-complete/**"
+      - ".github/workflows/compute-engine-cicd.yml"
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: Build Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -t ai-agent-backend:ci ./06-lab-complete
+
+      - name: Build frontend image
+        run: docker build -t ai-agent-frontend:ci ./06-lab-complete/frontend
+
+  deploy:
+    name: Deploy to Compute Engine
+    runs-on: ubuntu-latest
+    needs: ci
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Copy repository files to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.GCE_HOST }}
+          username: ${{ secrets.GCE_USER }}
+          key: ${{ secrets.GCE_SSH_KEY }}
+          port: ${{ secrets.GCE_PORT }}
+          source: "06-lab-complete/**"
+          target: "~/app"
+          overwrite: true
+          rm: false
+
+      - name: Restart application stack on VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GCE_HOST }}
+          username: ${{ secrets.GCE_USER }}
+          key: ${{ secrets.GCE_SSH_KEY }}
+          port: ${{ secrets.GCE_PORT }}
+          script_stop: true
+          script: |
+            set -euxo pipefail
+            cd ~/app/06-lab-complete
+            if [ ! -f .env ]; then
+              cp .env.example .env
+              echo ".env was missing and has been created from .env.example"
+            fi
+            docker compose up -d --build --remove-orphans
+            docker compose ps
+            curl --fail --silent --show-error http://localhost/health >/dev/null
